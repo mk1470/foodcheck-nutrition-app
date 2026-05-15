@@ -8,4 +8,5 @@ FoodCheck is a web application that helps users make better food choices by usin
 This application is designed for modern desktop browsers including Google Chrome, Safari, Microsoft Edge, and Firefox. The layout is also responsive for mobile browsers on iOS and Android.
 
 ## Developer Manual
-The developer manual is located in the bottom half of this README and in the `DEVELOPERMANUAL.MD` file.
+The developer manual is located in the bottom half of this README and in the `DEVELOPERMANUAL.MD` (docs/DEVELOPERMANUAL.md) file.
+[Link](docs/INSTALLATION.MD)

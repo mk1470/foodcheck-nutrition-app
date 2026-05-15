@@ -491,6 +491,9 @@ a {
   .about {
     grid-template-columns: 1fr;
   }
+  .tools-card {
+    grid-column: span 1;
+  }
 }
 
 .about-card-2 {
@@ -534,8 +537,7 @@ a {
 }
 
 .lookup input,
-.showdown input,
-.favorites input {
+.showdown input {
   padding: 12px;
   border-radius: 12px;
   border: none;
@@ -562,30 +564,52 @@ a {
   transform: translateY(-2px);
 }
 
-.lookup-result {
-  margin-top: 16px;
-  line-height: 1.5;
+
+/* Favorites Section */
+.favorites {
+  width: 80%;
 }
 
-.lookup-result h3 {
-  margin-bottom: 8px;
+#favorites-table {
+  overflow-x: auto;
 }
 
-.fav-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
-  margin-top: 20px;
+.favorites-table {
+  border-collapse: collapse;
+  margin: 25px 0;
+  font-size: 0.9em;
+  font-family: sans-serif;
+  min-width: 400px;
+  box-shadow: 0 0 20px #00a1ff;
+  border-radius: 25px;
 }
 
-.fav-card {
-  background: rgba(15, 56, 84, 0.35);
-  border-radius: 16px;
-  padding: 16px;
-  border: 1px solid #0f3854;
+.favorites-table thead tr {
+  background-color: #22c55e;
+  text-align: left;
+  border-radius: 25px;
 }
 
-.fav-card h4 {
-  margin: 0 0 8px;
-  font-size: 1rem;
+
+.favorites-table th,
+.favorites-table td {
+    padding: 12px 15px;
+    border: 1px solid #0f3854;
+}
+
+.favorites-table tbody tr {
+  border-bottom: 5px solid #dddddd;
+}
+
+.favorites-table tbody tr:nth-of-type(even) {
+  background-color: #f3f3f3;
+}
+
+.favorites-table tbody tr:last-of-type {
+  border-bottom: 2px solid #0f3854;
+}
+
+.favorites-table tbody tr.active-row {
+  font-weight: bold;
+  color: #22c55e;
 }

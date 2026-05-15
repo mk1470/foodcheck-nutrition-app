@@ -6,333 +6,281 @@ function goToAbout() {
   window.location.href = "about.html";
 }
 
-let nutritionChart = null;
+let myChart = null;
+let lastProduct = null;
+let lastWinner = null;
 
-/** Parsed rows from OFF_Products.csv (filled on first lookup). */
-let offCsvRows = null;
+async function getProductInfo(input) {
+  try {
+    const response = await fetch(`/search-product?name=${encodeURIComponent(input)}`);
+    const products = await response.json();
+    let product = products[0];
 
-async function lookupCode(productName) {
-  const needle = productName.toLowerCase().trim();
-  if (!needle) return null;
+    if (!product) return null;
 
-  if (!offCsvRows) {
-    const response = await fetch("OFF_Products.csv");
-    const csvText = await response.text();
-    const data = Papa.parse(csvText, {
-      header: true,
-    });
-    offCsvRows = data.data;
-  }
-
-  const products = offCsvRows;
-  const match = products.find((product) => {
-    if (!product || !product.code) return false;
-    const rowText = Object.values(product)
-      .filter((v) => v != null && String(v).trim() !== "")
-      .join(" ")
-      .toLowerCase();
-    return rowText.includes(needle);
-  });
-
-  if (match) {
-    return match.code;
-  } else {
+    const nutriments = product.nutriments || {};
+    return {
+      id: product.code || '',
+      name: product.product_name || 'Unknown Product',
+      brand: product.brands || 'N/A',
+      image: product.image_front_url || '',
+      calories: nutriments['energy-kcal_100g'] || 0,
+      fat: nutriments.fat_100g || 0,
+      sugar: nutriments.sugars_100g || 0,
+      protein: nutriments.proteins_100g || 0,
+      carbs: nutriments.carbohydrates_100g || 0,
+      nutriScore: product.nutrition_grades || 'N/A',
+      allergens: product.allergens || 'N/A',
+      ingredients: product.ingredients_text || 'N/A'
+    };
+  } catch (error) {
+    console.error('Error fetching product info:', error);
+    alert('Error fetching product info. Please try again.');
     return null;
   }
 }
 
-// Search product + display nutrition info
 async function productInfo() {
-
+  const input = document.getElementById("input_1").value.trim();
   const output = document.getElementById("lookup-result");
 
-  const input =
-    document.getElementById("input_1").value.trim();
-
   if (!input) {
-    output.innerHTML = "Enter a product name.";
+    alert("Please enter a product name.");
     return;
   }
 
   output.innerHTML = "Searching...";
 
-  const code = await lookupCode(input);
+  const productInfo = await getProductInfo(input);
 
-  if (!code) {
+  if (!productInfo) {
     output.innerHTML = "Product not found.";
     return;
   }
 
-  // Get product details
-  const productUrl =
-    `https://world.openfoodfacts.org/api/v2/product/${code}`;
-
-  const response = await fetch(productUrl);
-
-  const data = await response.json();
-
-  const item = data.product;
-
-  if (!item) {
-    output.innerHTML =
-      "Found a code in your CSV, but Open Food Facts has no product data for it.";
-    return;
-  }
-
-  const nutriments = item.nutriments || {};
-
-  // Display info
   output.innerHTML = `
+    <h2>${productInfo.name}</h2>
 
-    <div class="product-display">
+    <img src="${productInfo.image}" width="200">
 
-      <div class="product-info">
-
-        <img src="${item.image_front_url}" width="220">
-
-        <h2>${item.product_name}</h2>
-
-      </div>
-
-      <div class="product-text">
-
-        <p><strong>Brand:</strong> ${item.brands || "N/A"}</p>
-
-        <p><strong>Calories:</strong>
-        ${nutriments["energy-kcal_100g"] || 0} kcal</p>
-
-        <p><strong>Fat:</strong>
-        ${nutriments.fat_100g || 0} g</p>
-
-        <p><strong>Sugar:</strong>
-        ${nutriments.sugars_100g || 0} g</p>
-
-        <p><strong>Protein:</strong>
-        ${nutriments.proteins_100g || 0} g</p>
-
-        <p><strong>Carbs:</strong>
-        ${nutriments.carbohydrates_100g || 0} g</p>
-
-        <p><strong>Nutri-Score:</strong>
-        ${item.nutrition_grades || "N/A"}</p>
-
-      </div>
-
-    </div>
-
+    <p><strong>Brand:</strong> ${productInfo.brand}</p>
+    <p><strong>Calories:</strong> ${productInfo.calories} kcal</p>
+    <p><strong>Fat:</strong> ${productInfo.fat} g</p>
+    <p><strong>Sugar:</strong> ${productInfo.sugar} g</p>
+    <p><strong>Protein:</strong> ${productInfo.protein} g</p>
+    <p><strong>Carbs:</strong> ${productInfo.carbs} g</p>
+    <p><strong>Nutri-Score:</strong> ${productInfo.nutriScore.toUpperCase()}</p>
+    <p><strong>Allergens:</strong> ${productInfo.allergens}</p>
+    <p><strong>Ingredients:</strong> ${productInfo.ingredients}</p>
   `;
 
-  renderChart(item);
-
+  makeChart(productInfo);
+  lastProduct = productInfo;
+  document.getElementById('fave-btn').innerHTML = `
+    <button onclick='saveFavorite(lastProduct)'>⭐ Save to Favorites</button>`;
+  
 }
 
-// Nutrition chart
-function renderChart(product) {
-
-  const n = product.nutriments || {};
-
-  const values = [
-
-    Number(n["energy-kcal_100g"]) || 0,
-
-    Number(n.sugars_100g) || 0,
-
-    Number(n.proteins_100g) || 0,
-
-    Number(n.carbohydrates_100g) || 0
-
-  ];
-
-  const barColors = [
-    "#b91d47",
-    "#00aba9",
-    "#2b5797",
-    "#e8c3b9",
-    "#1e7145"
-  ];
-  
-  const ctx = document.getElementById('myChart');
-  
-  if (nutritionChart) {
-    nutritionChart.destroy();
+function makeChart(productInfo) {
+  if (myChart) {
+    myChart.destroy();
+    myChart = null;
   }
+  const ctx = document.getElementById("myChart");
 
-  nutritionChart = new Chart(ctx, {
-    type: "doughnut", 
+  myChart = new Chart(ctx, {
+    type: "doughnut",
     data: {
       labels: ["Calories", "Sugar", "Protein", "Carbs"],
       datasets: [{
-        backgroundColor: barColors,
-        data: values
+        backgroundColor: ["#2ECC71", "#E74C3C", "#3498DB", "#9B59B6"],
+        data: [
+          productInfo.calories,
+          productInfo.sugar,
+          productInfo.protein,
+          productInfo.carbs
+        ]
       }]
     },
     options: {
       plugins: {
-        legend: {display:true},
+        legend: {
+          display: true
+        },
         title: {
           display: true,
-            text: product.product_name,
-          font: {size:16}
+          text: productInfo.name,
+          font: {
+            size: 16
+          }
         }
       }
     }
   });
 
+
 }
 
-// Snack showdown
 async function showdown() {
+  const input_1 = document.getElementById("input_2").value.trim();
+  const input_2 = document.getElementById("input_3").value.trim();
+  const output = document.getElementById("typed-element");
 
-  const output =
-    document.getElementById("typed-element");
-
-  output.innerHTML = "Searching...";
-
-  const input1 =
-    document.getElementById("input_2").value.trim();
-
-  const input2 =
-    document.getElementById("input_3").value.trim();
-
-  if (!input1 || !input2) {
-
-    output.innerHTML =
-      "Enter two products.";
-
+  if (!input_1 || !input_2) {
+    alert("Please enter both product names.");
     return;
   }
 
-  // Search first product
-  const search1 =
-    await fetch(
-      `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${input1}&search_simple=1&action=process&json=1`
-    );
+  output.innerHTML = "Comparing...";
 
-  const data1 = await search1.json();
+  const productInfo_1 = await getProductInfo(input_1);
+  const productInfo_2 = await getProductInfo(input_2);
 
-  // Search second product
-  const search2 =
-    await fetch(
-      `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${input2}&search_simple=1&action=process&json=1`
-    );
-
-  const data2 = await search2.json();
-
-  const product1 = data1.products[0];
-
-  const product2 = data2.products[0];
-
-  if (!product1 || !product2) {
-
-    output.innerHTML =
-      "One or both products not found.";
-
+  if (!productInfo_1 || !productInfo_2) {
+    output.innerHTML = "Product not found.";
     return;
   }
 
-  const score1 =
-    product1.nutrition_grades || "N/A";
-
-  const score2 =
-    product2.nutrition_grades || "N/A";
-
+  let image = "";
   let winner = "";
-
-  if (score1 < score2) {
-
-    winner =
-      `${product1.product_name} is healthier!`;
-
-  } else if (score2 < score1) {
-
-    winner =
-      `${product2.product_name} is healthier!`;
-
+  let product = null;
+  if (productInfo_1.nutriScore > productInfo_2.nutriScore) {
+    product = productInfo_1;
+    winner = productInfo_1.name;
+    image = productInfo_1.image;
+  } else if (productInfo_1.nutriScore < productInfo_2.nutriScore) {
+    product = productInfo_2;
+    winner = productInfo_2.name;
+    image = productInfo_2.image;
   } else {
-
-    winner =
-      "Both products are similar.";
-
+    winner = productInfo_1.name + " and " + productInfo_2.name;
+    product = null;
   }
 
-  output.innerHTML = `
-
-    <h3>Snack Showdown Results</h3>
-
-    <p>
-      <strong>${product1.product_name}</strong>
-      — Nutri-Score: ${score1}
-    </p>
-
-    <p>
-      <strong>${product2.product_name}</strong>
-      — Nutri-Score: ${score2}
-    </p>
-
-    <h2>${winner}</h2>
-
-  `;
+  output.innerHTML = "";
+  var typed = new Typed('#typed-element', {
+    strings: ["Lets see who the healthier option is is....", `${winner} WON THE SHOWDOWN!`],
+    typeSpeed: 35,
+    startDelay: 500,
+    backDelay: 1000,
+    backSpeed: 35,
+    smartBackspace: true,
+    loop: false,
+    onComplete: function() {
+      document.getElementById("winner-image").src = image;
+      lastWinner = product;
+      document.getElementById('fave-btn-2').innerHTML = `<button onclick='saveFavorite(lastWinner)'>⭐ Save to Favorites</button>`;
+    }
+});
 
 }
 
-// Save favorites
-function saveFavorite() {
+async function saveFavorite(productInfo) {
+  await fetch(`/favorite`, {
+    method: 'POST', 
+    body: JSON.stringify({
+      name: productInfo.name,
+      barcode: productInfo.id,
+      image: productInfo.image,
+      calories: productInfo.calories,
+      sugar: productInfo.sugar,
+      protein: productInfo.protein,
+      carbs: productInfo.carbs,
+      nutri_score: productInfo.nutriScore,
+    }),
+    headers: {
+      'content-type': 'application/json',
+    },
+  }).then((result) => result.json());
 
-  const productName =
-    document.querySelector(".product-info h2");
-
-  if (!productName) {
-
-    alert("Search for a product first.");
-
-    return;
-  }
-
-  const favorites =
-    JSON.parse(localStorage.getItem("favorites")) || [];
-
-  favorites.push(productName.innerText);
-
-  localStorage.setItem(
-    "favorites",
-    JSON.stringify(favorites)
-  );
-
-  alert("Saved to favorites!");
+  await loadFavorites();
 
 }
+async function loadFavorites() {
+  await fetch('/favorites')
+  .then((result) => result.json())
+  .then((resultJson) => {
+    console.log(resultJson);
+    const fTable = document.getElementById('favorites-table');
+    const table = document.createElement('table');
+    table.setAttribute('id', 'favInfo');
+    // Setting up table Heading Row
+    const tableRow = document.createElement('tr');
+    const tableHeadingId = document.createElement('th');
+    tableHeadingId.innerHTML = 'Product ID';
+    const tableHeadingName = document.createElement('th');
+    tableHeadingName.innerHTML = 'Product Name';
+    const tableHeadingBarcode = document.createElement('th');
+    tableHeadingBarcode.innerHTML = 'Product Barcode';
+    const tableHeadingImage = document.createElement('th');
+    tableHeadingImage.innerHTML = 'Product Image';
+    const tableHeadingCalories = document.createElement('th');
+    tableHeadingCalories.innerHTML = 'Product Calories';
+    const tableHeadingSugar = document.createElement('th');
+    tableHeadingSugar.innerHTML = 'Product Sugar';
+    const tableHeadingProtein = document.createElement('th');
+    tableHeadingProtein.innerHTML = 'Product Protein';
+    const tableHeadingCarbs = document.createElement('th');
+    tableHeadingCarbs.innerHTML = 'Product Carbs';
+    const tableHeadingNutriScore = document.createElement('th');
+    tableHeadingNutriScore.innerHTML = 'Product Nutri-Score';
 
-// Load favorites
-function loadFavorites() {
+    tableRow.appendChild(tableHeadingId);
+    tableRow.appendChild(tableHeadingName);
+    tableRow.appendChild(tableHeadingBarcode);
+    tableRow.appendChild(tableHeadingImage);
+    tableRow.appendChild(tableHeadingCalories);
+    tableRow.appendChild(tableHeadingSugar);
+    tableRow.appendChild(tableHeadingProtein);
+    tableRow.appendChild(tableHeadingCarbs);
+    tableRow.appendChild(tableHeadingNutriScore);
 
-  const grid =
-    document.getElementById("favorites-grid");
 
-  const favorites =
-    JSON.parse(localStorage.getItem("favorites")) || [];
+    table.appendChild(tableRow);
 
-  if (favorites.length === 0) {
+    // Adding Data to table
+    resultJson.forEach((favorite) => {
+      const favTableRow = document.createElement('tr');
+      const favTableId = document.createElement('td');
+      const favTableName = document.createElement('td');
+      const favTableBarcode = document.createElement('td');
+      const favTableImage = document.createElement('td');
+      const favTableCalories = document.createElement('td');
+      const favTableSugar = document.createElement('td');
+      const favTableProtein = document.createElement('td');
+      const favTableCarbs = document.createElement('td');
+      const favTableNutriScore = document.createElement('td');
 
-    grid.innerHTML =
-      "<p>No favorites saved.</p>";
+      favTableId.innerHTML = favorite['id'];
+      favTableName.innerHTML = favorite['name'];
+      favTableBarcode.innerHTML = favorite['barcode'];
+      favTableImage.innerHTML = `<img id="fav-image" src="${favorite['image']}" width="100">`;;
+      favTableCalories.innerHTML = favorite['calories'];
+      favTableSugar.innerHTML = favorite['sugar'];
+      favTableProtein.innerHTML = favorite['protein'];
+      favTableCarbs.innerHTML = favorite['carbs'];
+      favTableNutriScore.innerHTML = favorite['nutri_score'];
+      
+      favTableRow.appendChild(favTableId);
+      favTableRow.appendChild(favTableName);
+      favTableRow.appendChild(favTableBarcode);
+      favTableRow.appendChild(favTableImage);
+      favTableRow.appendChild(favTableCalories);
+      favTableRow.appendChild(favTableSugar);
+      favTableRow.appendChild(favTableProtein);
+      favTableRow.appendChild(favTableCarbs);
+      favTableRow.appendChild(favTableNutriScore);
 
-    return;
-  }
+      table.appendChild(favTableRow);
+    });
 
-  grid.innerHTML = "";
+    const preExistingTable = document.getElementById('favInfo');
+    if (preExistingTable) {
+      preExistingTable.remove();
+    }
 
-  favorites.forEach(item => {
-
-    grid.innerHTML += `
-
-      <div class="fav-card">
-
-        <h3>${item}</h3>
-
-      </div>
-
-    `;
-
+    fTable.appendChild(table);
   });
-
+  
 }
+

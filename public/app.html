@@ -5,7 +5,6 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
-    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <script src="script.js" defer></script>
   </head>
 
@@ -41,15 +40,15 @@
    <!-- Product Lookup -->
    <div class="lookup">
     <h2>🔍 Product Lookup</h2>
-    <p>Enter a product name to view nutrition information (per 100g).</p>
+    <p>Enter a product barcode name to view its full nutrition information.</p>
     <input type="text" id="input_1" placeholder="e.g. peanut butter" />
-    <button type="button" onclick="productInfo()">Search</button>
-    <div id="lookup-result" class="lookup-result"></div>
-    <button type="button" onclick="saveFavorite()" style="margin-top: 8px;">Save to favorites</button>
-
-    <div style="width: 400px; max-width: 100%;">
+    <button onclick="productInfo()">Search</button>
+  
+    <div id="lookup-result"></div>
+    <div style="width: 400px;">
       <canvas id="myChart"></canvas>
     </div>
+    <div id="fave-btn"></div>
   
   </div>
 
@@ -63,18 +62,21 @@
     <p>Enter two product names to compare snacks head-to-head and find the winner.</p>
     <input type="text" id="input_2" placeholder="Product 1" />
     <input type="text" id="input_3" placeholder="Product 2" />
-    <button type="button" onclick="showdown()">Compare</button>
+    <button onclick="showdown()">Compare</button>
+  
+    <span id="typed-element" class = "winner"></span><br>
+    <img src="" id="winner-image" width="200">
 
-    <div id="typed-element" class="winner"></div>
+    <div id="fave-btn-2"></div>
   
   </div>
 
     <!-- Saved Favorites -->
   <div class="favorites">
     <h2>⭐ Saved Favorites</h2>
-    <p>After a lookup, use “Save to favorites” above. Load your list below.</p>
-    <button type="button" onclick="loadFavorites()">Load favorites</button>
-    <div id="favorites-grid" class="fav-grid"></div>
+    <p>View all products you have saved to your favorites list.</p>
+    <button onclick="loadFavorites()">Load Favorites</button>
+    <div id="favorites-table" class="favorites-table"></div>
   </div>
 
   </body>
