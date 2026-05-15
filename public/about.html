@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>FoodCheck - Home Page</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <!-- Navigation Bar Section -->
+    <div class="container">
+      <!-- This checkbox will give us the toggle behavior, it will be hidden, but functional -->
+      <input id="toggle" type="checkbox">
+  
+      <!-- IMPORTANT: Any element that we want to modify when the checkbox state changes go here, being "sibling" of the checkbox element -->
+  
+      <!-- This label is tied to the checkbox, and it will contain the toggle "buttons" -->
+      <label class="toggle-container" for="toggle">
+          <!-- If menu is open, it will be the "X" icon, otherwise just a clickable area behind the hamburger menu icon -->
+          <span class="button button-toggle"></span>
+      </label>
+  
+      <!-- The nav menu -->
+      <nav class="nav">
+          <a class="nav-item" href="main.html">Home</a>
+          <a class="nav-item" href="app.html">Food Checker</a>
+          <a class="nav-item" href="about.html">About</a>
+      </nav>
+    
+
+    <!-- Header Section -->
+    <header class="bar">
+      <h1>About FoodCheck 🥗 </h1>
+    </header>
+  </div>
+ 
+
+    <!-- About Page Content -->
+    <div class="about">
+
+      <div class="about-card">
+        <h2>The Problem</h2>
+        <p>Most people struggle to understand what is actually in the packaged food they buy. Nutrition labels are small and confusing, making it difficult to compare labels across products in a store aisle.</p>
+      </div>
+    
+      <div class="about-card">
+        <h2>Stakeholders</h2>
+        <p>FoodCheck is designed for anyone who wants to make smarter food decisions. It is useful for health-conscious consumers and people managing dietary restrictions such as allergies, diabetes, or high cholesterol.</p>
+      </div>
+    
+      <div class="about-card">
+        <h2>The Solution</h2>
+        <p>FoodCheck allows users to enter a product barcode and instantly receive a full nutrition breakdown including calories, sugar, fat, protein, allergens, and a Nutri-Score grade.</p>
+      </div>
+    
+      <div class="about-card">
+        <h2>API Used</h2>
+        <p><strong>Open Food Facts</strong> is a free, open-source food product database. FoodCheck sends barcodes to this API to retrieve nutrition information directly from their database. </p>
+      </div>
+
+
+      <div class="about-card-2">
+        <h2>Nutri-Score</h2>
+        <p>The Nutri-Score is a system that grades the nutrition of a product on a scale of A to E. It is based on the amount of healthy and unhealthy nutrients.<br>
+          <br>
+          <strong>Negative points:</strong> energy, saturated fat, sugars, sodium (high levels are considered unhealthy). <br>
+          <strong>Positive points:</strong> the proportion of fruits, vegetables and nuts, of olive, colza and nut oils, of fibers and proteins.</p> <br>
+          <p style="font-size: 10px;"> Explanation from Open Food Facts: <a  target="_blank" href = "https://world.openfoodfacts.org/nutriscore">https://world.openfoodfacts.org/nutriscore</a></p>
+      </div>
+    
+      <div class="about-card tools-card">
+        <h2>Technology Stack</h2>
+    
+        <div class="tools-grid">
+          <div class="tool-box">Open Food Facts API</div>
+          <div class="tool-box">HTML</div>
+          <div class="tool-box">CSS</div>
+          <div class="tool-box">JavaScript</div>
+          <div class="tool-box">Chart.js</div>
+          <div class="tool-box">Typed.js</div>
+          <div class="tool-box">Node.js</div>
+          <div class="tool-box">Supabase</div>
+          <div class="tool-box">Vercel</div>
+        </div>
+      </div>
+    
+    </div>
+
+  </body>
+
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>FoodCheck - Home Page</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+  </head>
+  
+  <body>
+    <!-- Navigation Bar Section -->
+    <div class="container">
+      <!-- This checkbox will give us the toggle behavior, it will be hidden, but functional -->
+      <input id="toggle" type="checkbox">
+  
+      <!-- IMPORTANT: Any element that we want to modify when the checkbox state changes go here, being "sibling" of the checkbox element -->
+  
+      <!-- This label is tied to the checkbox, and it will contain the toggle "buttons" -->
+      <label class="toggle-container" for="toggle">
+          <!-- If menu is open, it will be the "X" icon, otherwise just a clickable area behind the hamburger menu icon -->
+          <span class="button button-toggle"></span>
+      </label>
+  
+      <!-- The nav menu -->
+      <nav class="nav">
+          <a class="nav-item" href="main.html">Home</a>
+          <a class="nav-item" href="app.html">Food Checker</a>
+          <a class="nav-item" href="about.html">About</a>
+      </nav>
+    
+
+    <!-- Header Section -->
+    <header class="bar">
+      <h1>Welcome to FoodCheck 🥦! </h1>
+    </header>
+  </div>
+
+  <img src="https://as1.ftcdn.net/jpg/05/01/56/92/1000_F_501569274_wVbQ7NpKIM54c3gA6tIGyVHDyApUkuLn.jpg"
+  alt="Home Page Food Image" class="image_1">
+
+   <!-- Main Page Content -->
+   <div class="explain-box">
+
+    <h2>Explore These Features!</h2>
+  
+    <p>
+      FoodCheck helps users search food products, compare snacks, and save favorite products using nutrition data from the Open Food Facts API.
+    </p>
+  
+    <ul>
+  
+      <li>
+        Learn More About the Project
+        <ul>
+          
+          <li style="font-weight: bold;">
+            Head to the "About Page" to learn more about FoodCheck, the project goals, stakeholders, and tools used.
+          </li>
+
+        </ul>
+      </li>
+  
+      <li>
+        Product Nutrition Lookup
+        <ul>
+          <li style="font-weight: bold;">
+            Search for a packaged food product by entering a barcode to view nutrition information, calories, sugar, fat, protein, and allergens.
+          </li>
+
+        </ul>
+      </li>
+  
+      <li>
+        Snack Showdown Comparison
+        <ul>
+          <li style="font-weight: bold;">
+            Compare two snacks side-by-side and see which snack has the stronger nutrition value (based on the Nutri-Score).
+          </li>
+
+        </ul>
+      </li>
+  
+      <li>
+        Save Favorite Products
+        <ul>
+          <li style="font-weight: bold;">
+            Save products to your favorites list and load them later from the database.
+          </li>
+        </ul>
+      </li>
+  
+    </ul>
+  
+  </div>
+  
+  <div class="main_buttons">
+    <button class="btn-155" onclick="goToApp()">
+    <span class="button-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="currentcolor" viewBox="0 0 24 24"><path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path></svg>
+    </span>
+    <span class="button-text">Lets Get Checkin'!</span>
+    </button>
+
+    <button class="btn-155" onclick="goToAbout()">
+    <span class="button-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="currentcolor" viewBox="0 0 24 24"><path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path></svg>
+    </span>
+    <span class="button-text">About</span>
+    </button>
+  </div>
+
+
+  </body>
+
+</html>
